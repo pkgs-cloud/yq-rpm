@@ -1,5 +1,4 @@
 %define golang 1.11.8
-%define godl https://dl.google.com/go/go%{golang}.linux-amd64.tar.gz
 
 %undefine _missing_build_ids_terminate_build
 
@@ -10,8 +9,8 @@ Release: 1%{?dist}
 License: MIT
 Group: Applications/File
 URL: https://github.com/mikefarah/yq
-Source0: %{name}-%{version}.tar.gz
-Source1: %{godl}
+Source0: https://github.com/mikefarah/yq/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1: https://dl.google.com/go/go%{golang}.linux-amd64.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
@@ -20,9 +19,6 @@ The aim of the project is to be the jq or sed of yaml files.
 
 %prep
 %setup -c -n %{name}-%{version} -T -D
-if [ ! -f %{SOURCE1} ]; then
-    wget --no-check-certificate %{godl} -O %{SOURCE1}
-fi
 
 mkdir -p src/yq
 tar xzf %{SOURCE0} --strip 1 -C src/yq
@@ -42,12 +38,13 @@ CGO_ENABLED=0 go install ./...
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-cp bin/yq %{buildroot}%{_bindir}
+install -m 0755 bin/yq %{buildroot}%{_bindir}
 
 %clean
 rm -rf %{buildroot}
 
 %files
+%license src/yq/LICENSE
 %defattr(-,root,root,-)
 %{_bindir}/yq
 
